@@ -1,5 +1,4 @@
 // main.go
-
 package main
 
 import (
@@ -9,7 +8,7 @@ import (
 
 	"github.com/Priyapron/go-gorm-db/db"
 	"github.com/Priyapron/go-gorm-db/models"
-	"github.com/gin-contrib/cors" // Import the CORS middleware
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -36,7 +35,7 @@ func main() {
 	}
 
 	// AutoMigrate the database
-	err = database.AutoMigrate(&models.Item{}, &models.Student{}, &models.Subject{})
+	err = database.AutoMigrate(&models.Item{}, &models.Student{}, &models.Subject{}, &models.Register{})
 	if err != nil {
 		log.Fatalf("failed to migrate database: %v", err)
 	}
@@ -45,6 +44,7 @@ func main() {
 	itemRepo := models.NewItemRepository(database)
 	studentRepo := models.NewStudentRepository(database)
 	subjectRepo := models.NewSubjectRepository(database)
+	registerRepo := models.NewRegisterRepository(database)
 
 	// Initialize Gin router
 	r := gin.Default()
@@ -72,6 +72,9 @@ func main() {
 	r.GET("/subjects/:id", subjectRepo.GetSubject)
 	r.PUT("/subjects/:id", subjectRepo.UpdateSubject)
 	r.DELETE("/subjects/:id", subjectRepo.DeleteSubject)
+
+	// Register route
+	r.POST("/register", registerRepo.RegisterUser)
 
 	// 404 route
 	r.NoRoute(func(c *gin.Context) {
